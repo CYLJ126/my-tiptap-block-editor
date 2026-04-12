@@ -23,15 +23,10 @@ export default function PreviewButton({ editor }: { editor?: Editor }) {
           setHtml(editor?.getHTML());
         }
       }}
+      disablePointerDismissal
     >
-      <DialogTrigger asChild>
-        <Button>Preview</Button>
-      </DialogTrigger>
-      <DialogContent
-        className="sm:max-w-4xl p-0"
-        onInteractOutside={(evt) => evt.preventDefault()}
-        aria-describedby={undefined}
-      >
+      <DialogTrigger render={<Button>Preview</Button>}></DialogTrigger>
+      <DialogContent className="sm:max-w-4xl p-0" aria-describedby={undefined}>
         <DialogHeader className="p-5 pb-0">
           <DialogTitle>Preview</DialogTitle>
         </DialogHeader>

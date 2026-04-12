@@ -50,7 +50,7 @@ const BlockEditor = ({
     editorProps: {
       attributes: {
         spellcheck: "false",
-        class: cn("!pl-10"),
+        class: cn("pl-10!"),
       },
     },
     onCreate: ({ editor }) => {

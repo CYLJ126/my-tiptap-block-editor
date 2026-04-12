@@ -1,6 +1,10 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
 import { Editor } from "@tiptap/core";
 import { useEditorState } from "@tiptap/react";
@@ -20,25 +24,26 @@ export const LinkSelector = ({ editor }: { editor: Editor }) => {
 
   return (
     <Popover>
-      <PopoverTrigger asChild>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="rounded-none flex-shrink-0"
-          disabled={editorState.isMath}
-        >
-          <LinkIcon
-            className={cn("size-4", {
-              "text-primary": editorState.isLink,
-            })}
-            strokeWidth={2.5}
-          />
-        </Button>
-      </PopoverTrigger>
+      <PopoverTrigger
+        render={
+          <Button
+            variant="ghost"
+            size="icon"
+            className="rounded-none flex-shrink-0"
+            disabled={editorState.isMath}
+          >
+            <LinkIcon
+              className={cn("size-4", {
+                "text-primary": editorState.isLink,
+              })}
+              strokeWidth={2.5}
+            />
+          </Button>
+        }
+      ></PopoverTrigger>
       <PopoverContent
         className="w-fit shadow-xl rounded-md border p-1"
         align="end"
-        noPortal
       >
         <form
           className="flex space-x-1 items-center"

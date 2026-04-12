@@ -60,7 +60,7 @@ const CodeBlockView = ({
               </div>
             )}
           </PopoverTrigger>
-          <PopoverContent className="w-40 p-0 shadow-xl" align="start">
+          <PopoverContent className="w-40 p-0 shadow-xl gap-0" align="start">
             <div className="p-1">
               <Input
                 placeholder="Search..."
@@ -70,7 +70,7 @@ const CodeBlockView = ({
                 onChange={(evt) => setSearch(evt.target.value)}
               />
             </div>
-            <div className="flex max-h-[320px]">
+            <div className="flex max-h-80">
               <ScrollArea className="grow p-1">
                 {languages
                   .filter((v) => {
@@ -88,7 +88,7 @@ const CodeBlockView = ({
                           editor
                             .chain()
                             .focus(undefined, { scrollIntoView: false })
-                            .toggleCodeBlock({ language: l })
+                            .setCodeBlock({ language: l })
                             .run();
                         }}
                       >
@@ -144,10 +144,10 @@ const CodeBlockView = ({
           <Trash2Icon className="size-4" />
         </button>
       </div>
-      <div className="h-[1px] bg-gray-600 border-x" />
+      <div className="h-px bg-gray-600 border-x" />
       <div
         className={cn(
-          "flex !bg-gray-800 dark:!bg-gray-900 text-gray-200 overflow-x-auto",
+          "flex bg-gray-800! dark:bg-gray-900! text-gray-200 overflow-x-auto",
           "rounded rounded-t-none border border-t-0",
           "font-mono font-medium text-sm text-[15px]"
         )}
@@ -169,7 +169,7 @@ const CodeBlockView = ({
         </div>
         <pre className={cn("not-prose p-3 ps-0")}>
           <code className={language ? languageClassPrefix + language : null}>
-            <NodeViewContent className="!text-nowrap min-w-1" />
+            <NodeViewContent className="text-nowrap! min-w-1" />
           </code>
         </pre>
       </div>

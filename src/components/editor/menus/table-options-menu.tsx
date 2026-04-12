@@ -12,10 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 import { PluginKey, TextSelection } from "@tiptap/pm/state";
-import {
-  CellSelection,
-  deleteCellSelection
-} from "@tiptap/pm/tables";
+import { CellSelection, deleteCellSelection } from "@tiptap/pm/tables";
 import { Editor, useEditorState } from "@tiptap/react";
 import { EllipsisIcon, EllipsisVerticalIcon, EqualIcon } from "lucide-react";
 import { useMemo, useState } from "react";
@@ -38,13 +35,13 @@ const ColumnMenuPopover = ({ editor }: { editor: Editor }) => {
   const [opened, setOpened] = useState(false);
   return (
     <DropdownMenu
-      modal
-      onOpenChange={(open) => {
-        setOpened(open);
+      open={opened}
+      onOpenChange={setOpened}
+      onOpenChangeComplete={(op) => {
         editor
           .chain()
           .command(({ tr }) => {
-            tr.setMeta(columnMenuPluginKey, { openedMenu: open });
+            tr.setMeta(columnMenuPluginKey, { openedMenu: op });
             return true;
           })
           .run();
@@ -60,10 +57,10 @@ const ColumnMenuPopover = ({ editor }: { editor: Editor }) => {
         <EllipsisIcon className="size-4" />
       </DropdownMenuTrigger>
       <DropdownMenuContent
-        className="max-h-80 w-40 overflow-hidden overflow-y-auto rounded border shadow-xl"
+        className="max-h-80 w-40 overflow-hidden overflow-y-auto shadow-xl"
         align="start"
         // style={{
-        //   width: "var(--radix-dropdown-menu-trigger-width)"
+        //   width: "var(--anchor-width)"
         // }}
       >
         <DropdownMenuGroup>
@@ -83,10 +80,10 @@ const ColumnMenuPopover = ({ editor }: { editor: Editor }) => {
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem
-            className="text-destructive hover:text-destructive focus:text-destructive"
             onClick={() => {
               editor.chain().focus().deleteColumn().run();
             }}
+            variant="destructive"
           >
             Delete column
           </DropdownMenuItem>
@@ -100,13 +97,13 @@ const RowMenuPopover = ({ editor }: { editor: Editor }) => {
   const [opened, setOpened] = useState(false);
   return (
     <DropdownMenu
-      modal
-      onOpenChange={(open) => {
-        setOpened(open);
+      open={opened}
+      onOpenChange={setOpened}
+      onOpenChangeComplete={(op) => {
         editor
           .chain()
           .command(({ tr }) => {
-            tr.setMeta(rowMenuPluginKey, { openedMenu: open });
+            tr.setMeta(rowMenuPluginKey, { openedMenu: op });
             return true;
           })
           .run();
@@ -122,7 +119,7 @@ const RowMenuPopover = ({ editor }: { editor: Editor }) => {
         <EllipsisVerticalIcon className="size-4 shrink-0" />
       </DropdownMenuTrigger>
       <DropdownMenuContent
-        className="max-h-80 w-40 overflow-hidden overflow-y-auto rounded border shadow-xl"
+        className="max-h-80 w-40 overflow-hidden overflow-y-auto shadow-xl"
         align="start"
         side="right"
       >
@@ -143,10 +140,10 @@ const RowMenuPopover = ({ editor }: { editor: Editor }) => {
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem
-            className="text-destructive hover:text-destructive focus:text-destructive"
             onClick={() => {
               editor.chain().focus().deleteRow().run();
             }}
+            variant="destructive"
           >
             Delete row
           </DropdownMenuItem>
@@ -218,31 +215,35 @@ const CellMenuPopover = ({ editor }: { editor: Editor }) => {
     });
 
   return (
-    <DropdownMenu
-      onOpenChange={(open) => {
-        setOpened(open);
-      }}
-    >
+    <DropdownMenu open={opened} onOpenChange={setOpened}>
       <DropdownMenuTrigger
         className={cn(
-          "absolute flex items-center justify-center top-1/2 -translate-y-1/2 hover:-right-[9px] bg-primary size-2 hover:size-4 rounded-full cursor-pointer pointer-events-auto",
+          "absolute flex items-center justify-center top-1/2 -translate-y-1/2 hover:-right-2.25 bg-primary size-2 hover:size-4 rounded-full cursor-pointer pointer-events-auto",
           {
-            "size-4 -right-[9px]": opened,
-            "-right-[5px]": !opened,
-          }
+            "size-4 -right-2.25": opened,
+            "-right-1.25": !opened,
+          },
         )}
-      >
-        <EqualIcon
-          className={cn(
-            "size-3.5 text-primary-foreground opacity-0 hover:opacity-100",
-            {
-              "opacity-100": opened,
-            }
-          )}
-        />
-      </DropdownMenuTrigger>
+        render={
+          <button
+            onPointerDown={(evt) => {
+              evt.preventDefault();
+              setOpened(true);
+            }}
+          >
+            <EqualIcon
+              className={cn(
+                "size-3.5 text-primary-foreground opacity-0 hover:opacity-100",
+                {
+                  "opacity-100": opened,
+                },
+              )}
+            />
+          </button>
+        }
+      ></DropdownMenuTrigger>
       <DropdownMenuContent
-        className="flex max-h-80 w-40 flex-col overflow-hidden overflow-y-auto rounded border shadow-xl"
+        className="flex max-h-80 w-40 flex-col overflow-hidden overflow-y-auto shadow-xl"
         align="start"
         side="bottom"
       >
@@ -290,7 +291,7 @@ const CellMenuPopover = ({ editor }: { editor: Editor }) => {
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => {
-                   editor
+                    editor
                       .chain()
                       .focus()
                       .setCellAttribute("verticalAlign", "middle")

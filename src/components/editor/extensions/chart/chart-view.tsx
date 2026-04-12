@@ -1,14 +1,16 @@
+import { Alert } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
 import { NodeViewWrapper, ReactNodeViewProps } from "@tiptap/react";
+import { EditIcon, Trash2Icon } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
+import { ChartEditDialog } from "./chart-edit-dialog";
 import { ChartRenderer } from "./chart-renderer";
 import { ChartData, parseChartData } from "./common";
-import { ChartEditDialog } from "./chart-edit-dialog";
-import { Button } from "@/components/ui/button";
-import { EditIcon, Trash2Icon } from "lucide-react";
 
 export function ChartView({ editor, getPos, node }: ReactNodeViewProps) {
   const [chartData, setChartData] = useState<ChartData>();
   const [openChartEditDialog, setOpenChartEditDialog] = useState(false);
+  const [error, setError] = useState<string>();
 
   const deleteNode = useCallback(() => {
     const pos = getPos();
@@ -24,24 +26,22 @@ export function ChartView({ editor, getPos, node }: ReactNodeViewProps) {
         return true;
       })
       .run();
-  }, [editor, getPos, node.nodeSize]);
+  }, [editor, getPos, node]);
 
   const renderChart = useCallback(async () => {
     try {
       const parsed = JSON.parse(node.textContent);
       const result = parseChartData(parsed);
-      if (result.success) {
-        setChartData(result.data);
-      } else {
-        deleteNode();
-        alert(result.error);
+      if (!result.success) {
+        throw Error(result.error.message);
       }
-    } catch (error: any) {
-      console.error(error.message);
-      deleteNode();
-      alert(error.message);
+
+      setChartData(result.data);
+    } catch (e: any) {
+      console.error(e);
+      setError(e.message);
     }
-  }, [node.textContent, deleteNode]);
+  }, [node]);
 
   useEffect(() => {
     renderChart();
@@ -49,14 +49,21 @@ export function ChartView({ editor, getPos, node }: ReactNodeViewProps) {
 
   return (
     <NodeViewWrapper>
-      <div className="w-full flex justify-center items-center aspect-video p-2">
-        <ChartRenderer chartData={chartData} />
-      </div>
-      <div className="absolute flex space-x-2 top-2 right-2">
+      {error ? (
+        <div className="w-full p-2">
+          <Alert variant="destructive" className="mt-10">{error}</Alert>
+        </div>
+      ) : (
+        <div className="w-full flex justify-center items-center aspect-video p-2">
+          <ChartRenderer chartData={chartData} />
+        </div>
+      )}
+
+      <div className="absolute flex space-x-1 top-2 right-2">
         <Button
           variant="secondary"
           size="icon"
-          className="opacity-40 hover:opacity-100 size-7 !bg-zinc-300 !text-zinc-700"
+          className="opacity-40 hover:opacity-100 size-7 bg-zinc-300! text-zinc-700!"
           onClick={() => setOpenChartEditDialog(true)}
         >
           <EditIcon />
@@ -64,7 +71,7 @@ export function ChartView({ editor, getPos, node }: ReactNodeViewProps) {
         <Button
           variant="destructive"
           size="icon"
-          className="opacity-40 hover:opacity-100 size-7 !bg-red-600"
+          className="opacity-40 hover:opacity-100 size-7 bg-red-600!"
           onClick={deleteNode}
         >
           <Trash2Icon />
@@ -80,12 +87,7 @@ export function ChartView({ editor, getPos, node }: ReactNodeViewProps) {
             return;
           }
 
-          editor
-            .chain()
-            .focus()
-            .setNodeSelection(pos)
-            .setChart({ data })
-            .run();
+          editor.chain().focus().setNodeSelection(pos).setChart({ data }).run();
           setOpenChartEditDialog(false);
         }}
       />

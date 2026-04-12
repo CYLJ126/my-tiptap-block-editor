@@ -1,17 +1,11 @@
-import { ReactNode, useState } from "react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "./dropdown-menu";
 import { cn } from "@/lib/utils";
-import { buttonVariants } from "./button";
 import { ChevronDownIcon, Trash2Icon } from "lucide-react";
+import { ReactNode, useState } from "react";
+import { buttonVariants } from "./button";
 import { Input } from "./input";
+import { Item, ItemActions, ItemContent, ItemTitle } from "./item";
+import { Popover, PopoverContent, PopoverTrigger } from "./popover";
+import { Separator } from "./separator";
 
 interface BaseAutocompleteDropdownProps<T> {
   items: T[];
@@ -24,14 +18,16 @@ interface BaseAutocompleteDropdownProps<T> {
   onDelete?: (item: T) => void;
 }
 
-interface WithCreateSuggestionProps<T>
-  extends BaseAutocompleteDropdownProps<T> {
+interface WithCreateSuggestionProps<
+  T,
+> extends BaseAutocompleteDropdownProps<T> {
   showCreateSuggestion: true;
   onCreate: (value: string) => void;
 }
 
-interface WithoutCreateSuggestionProps<T>
-  extends BaseAutocompleteDropdownProps<T> {
+interface WithoutCreateSuggestionProps<
+  T,
+> extends BaseAutocompleteDropdownProps<T> {
   showCreateSuggestion?: false;
   onCreate?: (value: string) => void;
 }
@@ -52,6 +48,7 @@ function AutocompleteDropdown<T>({
   onSelect,
 }: AutocompleteDropdownProps<T>) {
   const [search, setSearch] = useState<string>();
+  const [open, setOpen] = useState(false);
 
   const contents = () => {
     const list = items.filter((v) => {
@@ -64,60 +61,76 @@ function AutocompleteDropdown<T>({
 
     if (showCreateSuggestion && list.length === 0 && search) {
       return (
-        <DropdownMenuItem
-          disabled={!search}
+        <Item
+          className="px-2 py-1.5 hover:bg-accent select-none"
+          role="button"
           onClick={() => {
             onCreate?.(search);
             setSearch(undefined);
+            setOpen(false);
           }}
         >
-          <div>
-            <span className="font-semibold">Create:&nbsp;</span>
-            {search}
-          </div>
-        </DropdownMenuItem>
+          <ItemContent>
+            <ItemTitle className="gap-0">
+              <span>Create:&nbsp;</span>
+              <span className="font-normal text-muted-foreground">
+                {search}
+              </span>
+            </ItemTitle>
+          </ItemContent>
+        </Item>
       );
     } else if (list.length === 0) {
-      <DropdownMenuItem className="text-muted-foreground hover:text-muted-foreground focus:text-muted-foreground">
-        No data
-      </DropdownMenuItem>;
+      return (
+        <div className="text-muted-foreground hover:text-muted-foreground focus:text-muted-foreground p-2">
+          No data
+        </div>
+      );
     }
 
     return list.map((item, i) => {
       return (
-        <DropdownMenuItem
+        <Item
           key={i}
           onClick={() => {
             onSelect?.(item);
+            setOpen(false);
           }}
-          className="relative pe-6"
+          className="px-2 py-1.5 hover:bg-accent select-none"
+          role="button"
         >
-          {renderItem(item)}
-          <div
-            className="absolute text-destructive end-1"
-            onClick={(evt) => {
-              evt.stopPropagation();
-              onDelete?.(item);
-            }}
-          >
-            <Trash2Icon className="size-4" />
-          </div>
-        </DropdownMenuItem>
+          <ItemContent>
+            <ItemTitle className="font-normal">{renderItem(item)}</ItemTitle>
+          </ItemContent>
+          <ItemActions>
+            <div
+              className="text-destructive hover:text-destructive/80 inset-e-1"
+              onClick={(evt) => {
+                evt.stopPropagation();
+                onDelete?.(item);
+              }}
+            >
+              <Trash2Icon className="size-4" />
+            </div>
+          </ItemActions>
+        </Item>
       );
     });
   };
   return (
-    <DropdownMenu
+    <Popover
+      open={open}
       onOpenChange={(op) => {
+        setOpen(op);
         if (op) {
           setSearch(undefined);
         }
       }}
     >
-      <DropdownMenuTrigger
+      <PopoverTrigger
         className={cn(
           buttonVariants({ variant: "outline" }),
-          "shadow-none w-full"
+          "shadow-none w-full",
         )}
       >
         <span
@@ -128,26 +141,29 @@ function AutocompleteDropdown<T>({
           {value ? `${value}` : placeholder}
         </span>
         <ChevronDownIcon className="size-4 opacity-50 ms-4" />
-      </DropdownMenuTrigger>
-      <DropdownMenuContent
+      </PopoverTrigger>
+      <PopoverContent
         align="start"
-        className="w-fit"
+        className="w-fit p-0"
         // style={{
-        //   width: "var(--radix-dropdown-menu-trigger-width)",
+        //   width: "var(--anchor-width)",
         // }}
       >
-        <DropdownMenuLabel className="font-normal p-1">
-          <Input
-            value={search ?? ""}
-            onChange={(evt) => {
-              setSearch(evt.target.value);
-            }}
-          />
-        </DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        <DropdownMenuGroup>{contents()}</DropdownMenuGroup>
-      </DropdownMenuContent>
-    </DropdownMenu>
+        <div className="flex flex-col gap-0.5">
+          <div className="p-1.5">
+            <Input
+              value={search ?? ""}
+              onChange={(evt) => {
+                console.log(evt.target.value);
+                setSearch(evt.target.value);
+              }}
+            />
+          </div>
+          <Separator />
+          <div className="flex flex-col p-1">{contents()}</div>
+        </div>
+      </PopoverContent>
+    </Popover>
   );
 }
 

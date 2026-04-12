@@ -62,7 +62,7 @@ const TiptapStarterKit = StarterKit.configure({
   link: {
     HTMLAttributes: {
       class: cn(
-        "!text-foreground underline underline-offset-[3px] transition-colors cursor-pointer"
+        "text-foreground! underline underline-offset-[3px] transition-colors cursor-pointer"
       ),
     },
     openOnClick: false,
@@ -101,7 +101,7 @@ const lowlight = createLowlight(common);
 const codeBlock = CustomCodeBlock.configure({
   HTMLAttributes: {
     class: cn(
-      "rounded !bg-gray-800 dark:!bg-gray-900 text-gray-200 border p-5 font-mono font-medium"
+      "rounded bg-gray-800! dark:bg-gray-900! text-gray-200 border p-5 font-mono font-medium"
     ),
     spellcheck: false,
   },
@@ -127,7 +127,7 @@ const TiptapTable = CustomTable.configure({
 const TiptapTableHeader = TableHeader.configure({
   HTMLAttributes: {
     class: cn(
-      "bg-muted dark:bg-gray-900 border border-default p-2 text-start min-w-[150px] font-semibold"
+      "bg-muted dark:bg-gray-900 border border-default p-2 text-start min-w-37.5 font-semibold"
     ),
   },
 });
@@ -149,7 +149,7 @@ const TiptapTableCell = TableCell.extend({
   },
 }).configure({
   HTMLAttributes: {
-    class: cn("border border-default p-2 min-w-[150px]"),
+    class: cn("border border-default p-2 min-w-37.5"),
   },
 });
 
@@ -162,7 +162,7 @@ const TiptapImage = Image.configure({
 
 const aiPlaceholder = AiPlaceholder.configure({
   HTMLAttributes: {
-    class: cn("!text-muted-foreground not-draggable"),
+    class: cn("text-muted-foreground! not-draggable"),
   },
 });
 

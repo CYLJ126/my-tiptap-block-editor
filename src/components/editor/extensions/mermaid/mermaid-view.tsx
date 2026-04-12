@@ -5,6 +5,7 @@ import { EditIcon, Trash2Icon } from "lucide-react";
 import mermaid from "mermaid";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { MermaidInputDialog } from "./mermaid-input-dialog";
+import { Alert } from "@/components/ui/alert";
 
 export function MermaidView({
   editor,
@@ -15,6 +16,7 @@ export function MermaidView({
 }: ReactNodeViewProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [openMermaidInputDialog, setOpenMermaidInputDialog] = useState(false);
+  const [error, setError] = useState<string>();
 
   const { options } = extension;
 
@@ -32,7 +34,7 @@ export function MermaidView({
         return true;
       })
       .run();
-  }, [editor, getPos, node.nodeSize]);
+  }, [editor, getPos, node]);
 
   const renderDiagram = useCallback(async () => {
     try {
@@ -42,11 +44,10 @@ export function MermaidView({
         containerRef.current.innerHTML = result.svg;
       }
     } catch (error: any) {
-      console.error(error.message);
-      deleteNode();
-      alert(error.message);
+      console.error(error);
+      setError(error.message);
     }
-  }, [node.textContent, deleteNode]);
+  }, [node]);
 
   useEffect(() => {
     renderDiagram();
@@ -54,15 +55,27 @@ export function MermaidView({
 
   return (
     <NodeViewWrapper>
+      {error ? (
+        <div className="w-full p-2">
+          <Alert variant="destructive" className="mt-10">
+            {error}
+          </Alert>
+        </div>
+      ) : (
+        <div
+          ref={containerRef}
+          className={cn(options.HTMLAttributes.class, HTMLAttributes.class)}
+        ></div>
+      )}
       <div
         ref={containerRef}
         className={cn(options.HTMLAttributes.class, HTMLAttributes.class)}
       ></div>
-      <div className="absolute flex space-x-2 top-2 right-2">
+      <div className="absolute flex space-x-1 top-2 right-2">
         <Button
           variant="secondary"
           size="icon"
-          className="opacity-40 hover:opacity-100 size-7 !bg-zinc-300 !text-zinc-700"
+          className="opacity-40 hover:opacity-100 size-7 bg-zinc-300! text-zinc-700!"
           onClick={() => setOpenMermaidInputDialog(true)}
         >
           <EditIcon />
@@ -70,7 +83,7 @@ export function MermaidView({
         <Button
           variant="destructive"
           size="icon"
-          className="opacity-40 hover:opacity-100 size-7 !bg-red-600"
+          className="opacity-40 hover:opacity-100 size-7 bg-red-600!"
           onClick={deleteNode}
         >
           <Trash2Icon />
