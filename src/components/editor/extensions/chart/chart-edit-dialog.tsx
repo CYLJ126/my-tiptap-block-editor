@@ -1,6 +1,7 @@
 import { Alert } from "@/components/ui/alert";
 import { AutocompleteDropdown } from "@/components/ui/autocomplete-dropdown";
 import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
 import { DatePicker } from "@/components/ui/date-picker";
 import {
   Dialog,
@@ -317,7 +318,7 @@ export function ChartEditDialog({
   const renderInsertMenus = (i: number) => {
     return (
       <DropdownMenuPortal>
-        <DropdownMenuSubContent>
+        <DropdownMenuSubContent className="min-w-30">
           <DropdownMenuLabel className="font-medium">
             Column type
           </DropdownMenuLabel>
@@ -394,19 +395,20 @@ export function ChartEditDialog({
             Add row
           </Button>
         </div>
-        <Table containerClass={cn("max-h-[250px] border mb-4")}>
+        <Table containerClass={cn("max-h-62.5 border mb-4")}>
           {dataField.fields.length === 0 && (
             <TableCaption className="mb-4">
               Manage your chart data.
             </TableCaption>
           )}
-          <TableHeader className="bg-accent sticky top-0 z-[1]">
+          <TableHeader className="bg-accent sticky top-0 z-1">
             <TableRow className="divide-x">
               {propertiesField.fields.map((p, i) => {
+                const iconClass = cn("size-5 text-muted-foreground");
                 return (
                   <TableHead
                     key={p.vId}
-                    className="min-w-[160px] h-10 p-0 hover:bg-secondary"
+                    className="min-w-45 h-10 p-0 hover:bg-secondary"
                   >
                     <DropdownMenu
                       onOpenChange={(op) => {
@@ -417,52 +419,36 @@ export function ChartEditDialog({
                         disabled={
                           columnMenuIndex !== undefined && i !== columnMenuIndex
                         }
-                        className="h-10 w-full relative"
+                        className="h-10 w-full flex items-center px-2 gap-2"
                       >
                         {p.type === "text" && (
-                          <CaseSensitiveIcon
-                            className={cn(
-                              "absolute left-2 top-[50%] -translate-y-[50%]",
-                              "text-muted-foreground"
-                            )}
-                          />
+                          <CaseSensitiveIcon className={iconClass} />
                         )}
                         {p.type === "number" && (
-                          <HashIcon
-                            className={cn(
-                              "absolute left-2 top-[50%] -translate-y-[50%]",
-                              "text-muted-foreground size-5"
-                            )}
-                          />
+                          <HashIcon className={iconClass}/>
                         )}
                         {p.type === "date" && (
-                          <CalendarIcon
-                            className={cn(
-                              "absolute left-2 top-[50%] -translate-y-[50%]",
-                              "text-muted-foreground size-5"
-                            )}
-                          />
+                          <CalendarIcon className={iconClass}/>
                         )}
                         {p.type === "select" && (
-                          <ChevronDownCircleIcon
-                            className={cn(
-                              "absolute left-2 top-[50%] -translate-y-[50%]",
-                              "text-muted-foreground size-5"
-                            )}
-                          />
+                          <ChevronDownCircleIcon className={iconClass} />
                         )}
 
                         <span>{watch(`properties.${i}.name`)}</span>
+                        <ChevronDownIcon className={cn("ms-auto", iconClass)} />
                       </DropdownMenuTrigger>
                       <DropdownMenuContent
                         className="drop-shadow-2xl"
                         style={{
-                          width: "var(--radix-dropdown-menu-trigger-width)",
+                          width: "var(--anchor-width)",
                         }}
                       >
-                        <DropdownMenuLabel className="font-normal p-1">
-                          <Input {...register(`properties.${i}.name`)} />
-                        </DropdownMenuLabel>
+                        <DropdownMenuGroup>
+                          <Input
+                            {...register(`properties.${i}.name`)}
+                            onKeyDown={(e) => e.stopPropagation()}
+                          />
+                        </DropdownMenuGroup>
                         <DropdownMenuSeparator />
                         <DropdownMenuGroup>
                           <DropdownMenuSub>
@@ -471,7 +457,7 @@ export function ChartEditDialog({
                               Change type
                             </DropdownMenuSubTrigger>
                             <DropdownMenuPortal>
-                              <DropdownMenuSubContent>
+                              <DropdownMenuSubContent className="min-w-30">
                                 <DropdownMenuLabel className="font-medium">
                                   Column type
                                 </DropdownMenuLabel>
@@ -540,8 +526,8 @@ export function ChartEditDialog({
                           <DropdownMenuSeparator hidden={p.default} />
                           <DropdownMenuItem
                             hidden={p.default}
-                            className="text-destructive hover:text-destructive focus:text-destructive"
                             onClick={() => deleteColumn(i)}
+                            variant="destructive"
                           >
                             Delete
                           </DropdownMenuItem>
@@ -566,30 +552,30 @@ export function ChartEditDialog({
                           control={control}
                           name={`data.${di}.${p.id}`}
                           render={({ field: { value, onChange } }) => {
-                            const date =
+                            const dateStr =
                               typeof value === "string" ? value : undefined;
+                            const date = dateStr
+                              ? parse(dateStr, "MMM dd, yyyy", new Date())
+                              : undefined;
                             return (
                               <DatePicker
-                                value={date}
+                                value={dateStr}
                                 placeholder={placeholder}
-                                calendarProps={(close) => {
-                                  return {
-                                    mode: "single",
-                                    selected: date
-                                      ? parse(date, "MMM dd, yyyy", new Date())
-                                      : undefined,
-                                    onSelect: (date) => {
-                                      if (date) {
-                                        onChange(format(date, "MMM dd, yyyy"));
-                                      } else {
-                                        onChange(undefined);
-                                      }
-
-                                      close();
-                                    },
-                                  };
-                                }}
-                              />
+                              >
+                                <Calendar
+                                  mode="single"
+                                  selected={date}
+                                  defaultMonth={date}
+                                  captionLayout="dropdown"
+                                  onSelect={(date) => {
+                                    if (date) {
+                                      onChange(format(date, "MMM dd, yyyy"));
+                                    } else {
+                                      onChange(undefined);
+                                    }
+                                  }}
+                                />
+                              </DatePicker>
                             );
                           }}
                         />
@@ -640,7 +626,7 @@ export function ChartEditDialog({
                                       if (op === v) {
                                         setValue(
                                           `data.${index}.${property.id}`,
-                                          undefined
+                                          undefined,
                                         );
                                       }
                                     });
@@ -707,7 +693,7 @@ export function ChartEditDialog({
         </h4>
 
         <div className="flex space-x-4 overflow-x-auto">
-          <div className="flex flex-col w-[250px] gap-4">
+          <div className="flex flex-col w-62.5 gap-4">
             <div className="flex flex-col">
               <div className="text-sm font-medium leading-none mb-1.5">
                 Title
@@ -732,33 +718,35 @@ export function ChartEditDialog({
                 Type
               </div>
               <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" className="justify-start">
-                    <Controller
-                      control={control}
-                      name={`config.type`}
-                      render={({ field: { value } }) => {
-                        return (
-                          <>
-                            {renderChartIcon(value)}
-                            <span
-                              className={cn("font-normal", {
-                                "opacity-50": !value,
-                              })}
-                            >
-                              {uppercaseFirstChar(value) || "Chart type..."}
-                            </span>
-                          </>
-                        );
-                      }}
-                    />
-                    <ChevronDownIcon className="ms-auto opacity-50" />
-                  </Button>
-                </DropdownMenuTrigger>
+                <DropdownMenuTrigger
+                  render={
+                    <Button variant="outline" className="justify-start">
+                      <Controller
+                        control={control}
+                        name={`config.type`}
+                        render={({ field: { value } }) => {
+                          return (
+                            <>
+                              {renderChartIcon(value)}
+                              <span
+                                className={cn("font-normal", {
+                                  "opacity-50": !value,
+                                })}
+                              >
+                                {uppercaseFirstChar(value) || "Chart type..."}
+                              </span>
+                            </>
+                          );
+                        }}
+                      />
+                      <ChevronDownIcon className="ms-auto opacity-50" />
+                    </Button>
+                  }
+                ></DropdownMenuTrigger>
                 <DropdownMenuContent
                   align="start"
                   style={{
-                    width: "var(--radix-dropdown-menu-trigger-width)",
+                    width: "var(--anchor-width)",
                   }}
                 >
                   <DropdownMenuGroup>
@@ -791,33 +779,35 @@ export function ChartEditDialog({
                 Label
               </div>
               <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" className="justify-start">
-                    <Controller
-                      control={control}
-                      name={`config.labelKey`}
-                      render={({ field: { value } }) => {
-                        const property = value
-                          ? propertiesWatch.find((p) => p.id === value)
-                          : undefined;
-                        return (
-                          <span
-                            className={cn("font-normal", {
-                              "opacity-50": property === undefined,
-                            })}
-                          >
-                            {property?.name || "Label column..."}
-                          </span>
-                        );
-                      }}
-                    />
-                    <ChevronDownIcon className="ms-auto opacity-50" />
-                  </Button>
-                </DropdownMenuTrigger>
+                <DropdownMenuTrigger
+                  render={
+                    <Button variant="outline" className="justify-start">
+                      <Controller
+                        control={control}
+                        name={`config.labelKey`}
+                        render={({ field: { value } }) => {
+                          const property = value
+                            ? propertiesWatch.find((p) => p.id === value)
+                            : undefined;
+                          return (
+                            <span
+                              className={cn("font-normal", {
+                                "opacity-50": property === undefined,
+                              })}
+                            >
+                              {property?.name || "Label column..."}
+                            </span>
+                          );
+                        }}
+                      />
+                      <ChevronDownIcon className="ms-auto opacity-50" />
+                    </Button>
+                  }
+                ></DropdownMenuTrigger>
                 <DropdownMenuContent
                   align="start"
                   style={{
-                    width: "var(--radix-dropdown-menu-trigger-width)",
+                    width: "var(--anchor-width)",
                   }}
                 >
                   <DropdownMenuGroup>
@@ -850,19 +840,21 @@ export function ChartEditDialog({
                 Data
               </div>
               <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="outline" className="justify-start">
-                    <span className={cn("font-normal")}>
-                      {propertiesWatch.find((p) => p.id === dataKeyWatch)
-                        ?.name || "Count"}
-                    </span>
-                    <ChevronDownIcon className="ms-auto opacity-50" />
-                  </Button>
-                </DropdownMenuTrigger>
+                <DropdownMenuTrigger
+                  render={
+                    <Button variant="outline" className="justify-start">
+                      <span className={cn("font-normal")}>
+                        {propertiesWatch.find((p) => p.id === dataKeyWatch)
+                          ?.name || "Count"}
+                      </span>
+                      <ChevronDownIcon className="ms-auto opacity-50" />
+                    </Button>
+                  }
+                ></DropdownMenuTrigger>
                 <DropdownMenuContent
                   align="start"
                   style={{
-                    width: "var(--radix-dropdown-menu-trigger-width)",
+                    width: "var(--anchor-width)",
                   }}
                 >
                   <DropdownMenuGroup>
@@ -909,27 +901,29 @@ export function ChartEditDialog({
                 Group by
               </div>
               <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className="justify-start"
-                    disabled={propertiesWatch.length < 3 || !canGroup()}
-                  >
-                    <span
-                      className={cn("font-normal", {
-                        "text-muted-foreground": !groupKeyWatch,
-                      })}
+                <DropdownMenuTrigger
+                  render={
+                    <Button
+                      variant="outline"
+                      className="justify-start"
+                      disabled={propertiesWatch.length < 3 || !canGroup()}
                     >
-                      {propertiesWatch.find((p) => p.id === groupKeyWatch)
-                        ?.name || "None"}
-                    </span>
-                    <ChevronDownIcon className="ms-auto opacity-50" />
-                  </Button>
-                </DropdownMenuTrigger>
+                      <span
+                        className={cn("font-normal", {
+                          "text-muted-foreground": !groupKeyWatch,
+                        })}
+                      >
+                        {propertiesWatch.find((p) => p.id === groupKeyWatch)
+                          ?.name || "None"}
+                      </span>
+                      <ChevronDownIcon className="ms-auto opacity-50" />
+                    </Button>
+                  }
+                ></DropdownMenuTrigger>
                 <DropdownMenuContent
                   align="start"
                   style={{
-                    width: "var(--radix-dropdown-menu-trigger-width)",
+                    width: "var(--anchor-width)",
                   }}
                 >
                   <DropdownMenuGroup>
@@ -1010,22 +1004,18 @@ export function ChartEditDialog({
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent
-        aria-describedby={undefined}
-        onInteractOutside={(evt) => evt.preventDefault()}
-        className="sm:max-w-4xl p-0"
-      >
+    <Dialog open={isOpen} onOpenChange={onOpenChange} disablePointerDismissal>
+      <DialogContent aria-describedby={undefined} className="sm:max-w-4xl p-0">
         <DialogHeader className="p-5 pb-0">
           <DialogTitle>Insert chart</DialogTitle>
         </DialogHeader>
         <div className="max-h-[80vh] overflow-y-auto px-5 py-2">
           {content()}
         </div>
-        <DialogFooter className="p-5 pt-0 gap-2 sm:gap-0">
-          <DialogClose asChild>
-            <Button variant="secondary">Cancel</Button>
-          </DialogClose>
+        <DialogFooter className="p-5 pt-0">
+          <DialogClose
+            render={<Button variant="secondary">Cancel</Button>}
+          ></DialogClose>
           <Button
             disabled={dataField.fields.length === 0 || isSubmitting}
             onClick={handleSubmit(onSubmit)}

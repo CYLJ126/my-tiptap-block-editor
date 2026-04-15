@@ -13,7 +13,7 @@ export const CustomTable = Table.extend({
     const table: DOMOutputSpec = [
       "div",
       {
-        class: cn("table-wrapper overflow-y-auto p-[1em] -ml-[1rem] relative"),
+        class: cn("table-wrapper overflow-y-auto p-[1em] -ml-4 relative"),
       },
       [
         "table",
@@ -39,9 +39,9 @@ export const CustomTable = Table.extend({
       
       const dom = document.createElement("div");
       dom.setAttribute("data-content-type", "table");
-      dom.className = cn("mb-[1rem]");
+      dom.className = cn("mb-4");
       const wrapper = document.createElement("div");
-      wrapper.className = cn("table-wrapper overflow-x-auto overflow-y-hidden p-[1rem] -ml-[1rem] relative");
+      wrapper.className = cn("table-wrapper overflow-x-auto overflow-y-hidden p-4 -ml-4 relative");
       
       const tableContainer = document.createElement("div");
       tableContainer.className = "table-container";

@@ -44,15 +44,12 @@ export function MermaidInputDialog({
   }, [isOpen, value]);
 
   return (
-    <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent
-        aria-describedby={undefined}
-        onInteractOutside={(evt) => evt.preventDefault()}
-      >
-        <DialogHeader>
+    <Dialog open={isOpen} onOpenChange={onOpenChange} disablePointerDismissal>
+      <DialogContent aria-describedby={undefined} className="p-0 sm:max-w-2xl">
+        <DialogHeader className="p-5 pb-0">
           <DialogTitle>Insert mermaid diagram</DialogTitle>
         </DialogHeader>
-        <div className="grid grid-cols-1">
+        <div className="grid grid-cols-1 max-h-[50vh] overflow-y-auto px-5 py-2">
           <div className="flex flex-col py-2">
             <Label htmlFor="mermaid-code" className="mb-2">
               Code
@@ -63,10 +60,10 @@ export function MermaidInputDialog({
             )}
           </div>
         </div>
-        <DialogFooter>
-          <DialogClose asChild>
-            <Button variant="secondary">Cancel</Button>
-          </DialogClose>
+        <DialogFooter className="p-5 pt-0">
+          <DialogClose
+            render={<Button variant="secondary">Cancel</Button>}
+          ></DialogClose>
           <Button disabled={code.trim().length === 0} onClick={handleSubmit}>
             {value ? "Update" : "Insert"}
           </Button>

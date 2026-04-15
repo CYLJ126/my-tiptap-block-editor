@@ -1,5 +1,9 @@
 import { Button } from "@/components/ui/button";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { Editor } from "@tiptap/core";
 import {
   ArrowDownNarrowWideIcon,
@@ -55,42 +59,42 @@ export const AiSelector = ({ editor }: { editor: Editor }) => {
   };
 
   return (
-    <Popover>
-      <PopoverTrigger asChild>
-        <Button variant="ghost" className="rounded-none text-primary">
-          <SparklesIcon className="size-4 me-2" strokeWidth={2.2} />
-          <span className="me-2">AI Tools</span>
-          <ChevronDownIcon className="size-3" />
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent
-        className="p-1 shadow-xl w-56"
-        align="start"
-        noPortal
-      >
-        {items.map((item, i) => {
-          return (
-            <div key={i} className="flex flex-col">
-              <h6 className="text-muted-foreground font-medium text-xs p-2">
-                {item.group}
-              </h6>
-              {item.commands.map((c, j) => {
-                return (
-                  <div
-                    key={j}
-                    onClick={() => {
-                      handleCommandClick(c.command);
-                    }}
-                    className="flex space-x-2 items-center rounded-md hover:bg-accent px-2 py-1.5 text-accent-foreground cursor-pointer"
-                  >
-                    <c.icon className="size-4 text-primary" />
-                    <span className="text-sm">{c.title}</span>
-                  </div>
-                );
-              })}
-            </div>
-          );
-        })}
+    <Popover modal>
+      <PopoverTrigger
+        render={
+          <Button variant="ghost" className="rounded-none text-primary">
+            <SparklesIcon className="size-4 me-2" strokeWidth={2.2} />
+            <span className="me-2">AI Tools</span>
+            <ChevronDownIcon className="size-3" />
+          </Button>
+        }
+      ></PopoverTrigger>
+      <PopoverContent className="p-1 shadow-xl w-56" align="start">
+        <div className="flex flex-col">
+          {items.map((item, i) => {
+            return (
+              <div key={i} className="flex flex-col">
+                <h6 className="text-muted-foreground font-medium text-xs p-2">
+                  {item.group}
+                </h6>
+                {item.commands.map((c, j) => {
+                  return (
+                    <div
+                      key={j}
+                      onClick={() => {
+                        handleCommandClick(c.command);
+                      }}
+                      className="flex space-x-2 items-center rounded-md hover:bg-accent px-2 py-1.5 text-accent-foreground cursor-pointer"
+                    >
+                      <c.icon className="size-4 text-primary" />
+                      <span className="text-sm">{c.title}</span>
+                    </div>
+                  );
+                })}
+              </div>
+            );
+          })}
+        </div>
       </PopoverContent>
     </Popover>
   );

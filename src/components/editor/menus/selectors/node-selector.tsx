@@ -1,5 +1,9 @@
 import { Button } from "@/components/ui/button";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { Editor } from "@tiptap/core";
 import { useEditorState } from "@tiptap/react";
 import {
@@ -117,37 +121,37 @@ export const NodeSelector = ({ editor }: { editor: Editor }) => {
   const activeItems = items.filter((item) => item.isActive(editorState));
 
   const name =
-    activeItems.length > 1 ? "Multiple" : activeItems.pop()?.name ?? "Text";
+    activeItems.length > 1 ? "Multiple" : (activeItems.pop()?.name ?? "Text");
 
   return (
-    <Popover>
-      <PopoverTrigger asChild>
-        <Button variant="ghost" className="rounded-none">
-          <span className="whitespace-nowrap text-sm me-2">{name}</span>
-          <ChevronDownIcon className="size-3" />
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent
-        className="w-48 p-1 shadow-xl"
-        align="start"
-        noPortal
-      >
-        {items.map((item, i) => {
-          return (
-            <div
-              key={i}
-              onClick={() => item.onClick(editor)}
-              className="flex items-center text-sm rounded-md hover:bg-accent text-accent-foreground px-2 py-1.5 cursor-pointer"
-            >
-              <item.icon className="size-3.5 me-2" />
-              <span>{item.name}</span>
-              <div className="flex-1"></div>
-              {item.isActive(editorState) && (
-                <CheckIcon className="size-3.5 ms-4" />
-              )}
-            </div>
-          );
-        })}
+    <Popover modal>
+      <PopoverTrigger
+        render={
+          <Button variant="ghost" className="rounded-none">
+            <span className="whitespace-nowrap text-sm me-2">{name}</span>
+            <ChevronDownIcon className="size-3" />
+          </Button>
+        }
+      ></PopoverTrigger>
+      <PopoverContent className="w-48 p-1 shadow-xl" align="start">
+        <div className="flex flex-col">
+          {items.map((item, i) => {
+            return (
+              <div
+                key={i}
+                onClick={() => item.onClick(editor)}
+                className="flex items-center text-sm rounded-md hover:bg-accent text-accent-foreground px-2 py-1.5 cursor-pointer"
+              >
+                <item.icon className="size-3.5 me-2" />
+                <span>{item.name}</span>
+                <div className="flex-1"></div>
+                {item.isActive(editorState) && (
+                  <CheckIcon className="size-3.5 ms-4" />
+                )}
+              </div>
+            );
+          })}
+        </div>
       </PopoverContent>
     </Popover>
   );
