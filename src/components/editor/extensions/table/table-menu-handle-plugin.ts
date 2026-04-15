@@ -517,7 +517,7 @@ export const TableMenuHandlePlugin = ({
           }
         },
         mousedown: handleMouseMove,
-        mouseleave: hideMenu,
+        // mouseleave: hideMenu,
       },
     },
   });
