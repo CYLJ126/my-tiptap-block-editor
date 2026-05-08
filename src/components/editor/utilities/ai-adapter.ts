@@ -1,18 +1,20 @@
-import { createGoogleGenerativeAI } from "@ai-sdk/google";
+import {createOpenRouter} from '@openrouter/ai-sdk-provider';
 import { streamText } from "ai";
 
 export default async function generateAiResponse({ prompt }: { prompt: string; }) {
-  const apiKey = import.meta.env.VITE_GOOGLE_GENERATIVE_AI_API_KEY;
+  // const apiKey = import.meta.env.DEEPSEEK_API_KEY;
+  const apiKey = import.meta.env.VITE_OPENROUTER_API_KEY;
+  console.log('meta.env: ', import.meta.env);
   if (!apiKey) {
-    throw Error("Require Gemini api key");
+    throw Error("Require OpenRouter api key");
   }
 
-  const google = createGoogleGenerativeAI({
+  const openRouter = createOpenRouter({
     apiKey: apiKey,
   });
 
   const result = streamText({
-    model: google("gemini-2.5-flash"),
+    model: openRouter.completion('google/gemini-3-flash-preview'),
     prompt: prompt,
   });
 
